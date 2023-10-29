@@ -1,7 +1,24 @@
-#list{
+body{
+    background-color: black;
+}
+
+#list {
     list-style: none;
 }
 
+form {
+    display: block;
+    margin: 4rem auto;
+    width: 4rem;
+}
+
+#add-button{
+    margin-left: 11.5rem;
+}
+
 #title-input{
-   display:block; 
+    width: 13.1rem;
+}
+
+li{
 }
