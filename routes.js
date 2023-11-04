@@ -19,7 +19,18 @@ function router(request, response) {
     } else if (url === '/todo.html') {
         return response.end(todoPage);
 
-    } else if (url === '/todo/add' && method === 'POST') {
+    } else if (url === '/todo/adding_title' && method === 'POST') {
+        let data = '';
+        request.on('data', (chunk) => (data += chunk.toString()));
+        request.on('end', () => {
+            addTodo(data);
+            response.writeHead(200, { Location: '/todo.html' });
+            return response.end(todoPage);
+        });
+
+        return;
+
+    } else if (url === '/todo/adding_text' && method === 'POST') {
         let data = '';
         request.on('data', (chunk) => (data += chunk.toString()));
         request.on('end', () => {

@@ -27,19 +27,35 @@ const todoPage = `<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="note-sticky.png">
 
   <title>To Do Page</title>
 </head>
 <body>
 
-  <form action="/todo/add" method="POST">
-    <div id="title_input"><input type="text" size="26.9" name="todo" autofocus/></div>
-    <textarea id="text_input" rows="8" cols="28">
-    </textarea>
-    <div id="add_button"><button type="submit">Create</button></div>
-  </form>
+<form action="/todo/adding_title" method="POST">
+ <div id="title_input">
+    <input type="text" name="title" size="27rem" autofocus placeholder="Enter title of note."/>
+  </div>
 
+  <button id="add_button" type="submit">Add</button>
+</form>
+
+<form action="/todo/adding_text" method="POST">
+    <div id="text_input">
+        <input type="text" name="text" size="27rem" autofocus placeholder="Enter Text of note."/>
+    </div>
+  <button id="add_button" type="submit">Add </button>
+</form>
+
+<div id="todo_list">
+    <ul id="note">
+    <li></li>
+    </ul>
+</div>
+
+
+
+<!-- Putting this in an external stylesheet did not work.-->
 <style>
 
   body {
@@ -47,14 +63,10 @@ const todoPage = `<html>
     }
 
     form {
-        margin-left: 34rem;
+        margin-left: 50rem;
         margin-top: 2rem;
-        
     }
 
-    #add_button{
-        margin-left: 9.5rem;
-    }
 
 </style>
 
