@@ -13,24 +13,13 @@ function router(request, response) {
     }
 
     if (url === '/index.html') {
-        const { welcomePage } = require('./pages');
         return response.end(welcomePage);
 
     } else if (url === '/todo.html') {
         return response.end(todoPage);
+        
 
-    } else if (url === '/todo/adding_title' && method === 'POST') {
-        let data = '';
-        request.on('data', (chunk) => (data += chunk.toString()));
-        request.on('end', () => {
-            addTodo(data);
-            response.writeHead(200, { Location: '/todo.html' });
-            return response.end(todoPage);
-        });
-
-        return;
-
-    } else if (url === '/todo/adding_text' && method === 'POST') {
+    } else if (url === '/todo/adding_note' && method === 'POST') {
         let data = '';
         request.on('data', (chunk) => (data += chunk.toString()));
         request.on('end', () => {
@@ -43,7 +32,7 @@ function router(request, response) {
 
     } else {
         response.statusCode = 404;
-        const { errorPage } = require('./pages');
+        // const { errorPage } = require('./pages'); // One can either write it like this or define the page at the top, with the other two pages. 
         response.end(errorPage);
     }
 }
@@ -53,32 +42,45 @@ function router(request, response) {
 function addTodo(data) {
 
     const filename = "./todo.txt";
-    const note = processUserData(data);
-
+    // const note = processUserData(data);
+    
+    const { title, text } = parseFormData(data);
+    const note = `${title}\n${text}\n`;
+    
     fs.exists(filename, exists => {
 
         if (exists) {
             updateNotes(filename, note);
 
         } else {
-            createNotes(filename, note);
+            createFile(filename, note);
         }
 
     });
 }
 
-function processUserData(data) {
+
+function parseFormData(data) {
+    const formData = new URLSearchParams(data);
+    return {
+        title: formData.get('title'),
+        text: formData.get('text')
+    };
+}
+
+
+/*function processUserData(data) {
     return decodeURIComponent(data)
         .replace(/(.*?)=(.*)/g, (m, key, value) => value) // g = Global.
         .replace(/\+/g, " "); // + will be replaced by space.
-}
+}*/
 
 
 function updateNotes(filename, note) {
     fs.readFile(filename, "utf-8", (error, content) => {
 
         if (!error) {
-            createNotes(filename, [content, note].join("\n"));
+            createFile(filename, [content, note].join("\n"));
 
         } else {
             console.error(`Could not read file ${filename}.`);
@@ -86,15 +88,20 @@ function updateNotes(filename, note) {
     });
 }
 
-function createNotes(filename, note) {
-    console.log(`Creating note ${filename}:`, "\n", note);
-    fs.writeFile(filename, note, error => {
+function createFile(filename, note) {
+    console.log(`Creating file ${filename}:`, "\n", note);
 
+    fs.writeFile(filename, note, error => {
         if (error) {
             console.error(`Could not create file ${filename}.`);
             console.log(error);
         }
     });
+}
+
+
+function deleteNote(){
+    
 }
 
 module.exports = { router };

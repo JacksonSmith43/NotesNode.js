@@ -1,3 +1,5 @@
 body{
-margin-bottom: 3rem;
+    background-color: red;
+    display: flex;
+
 }
