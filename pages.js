@@ -49,8 +49,9 @@ const todoPage = `<!DOCTYPE html>
         <button id="add_button" type="submit">Add</button>
       </form>
     
-      <ul id="notesList">
+      <ul id="notes-list">
       <li>*</li>
+
       </ul>
 
         <!-- Putting this in an external stylesheet did not work.-->
@@ -60,20 +61,29 @@ const todoPage = `<!DOCTYPE html>
           background-color: gray;
         }
 
-      #title_input {
-        margin-left: 50rem;
-        margin-top: 2rem;
-        display: flex;
+        #title_input {
+          margin-left: 50rem;
+          margin-top: 2rem;
+          display: flex;
+        }
 
-      }
-      textarea{
-        margin-left: 50rem;
-        height: 8rem;
-        width: 12.5rem;
-      }
+        textarea{
+          margin-left: 50rem;
+          height: 8rem;
+          width: 12.5rem;
+        }
 
+        li{
+          font-family: sans-serif;
+          list-style: none;
+          margin-bottom: 1.5rem;
+          display:flex;
+        }
 
-
+        #notes-list{
+          margin-left: 45rem;
+        }
+     
     </style>
 
 

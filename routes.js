@@ -5,8 +5,16 @@ const notesArray = []; // Browser.
 const filename = "./todo.txt";
 
 function router(request, response) {
+
     const { url, method } = request;
-    const notesList = `<ul>${notesArray.map(notesTerminal => `<li>${notesTerminal}</li>`).join('')}</ul>`;
+
+    const notesList = `<ul>${notesArray.map((note, index) => `<li>${note}
+    <form action="/todo/delete_note/${index}" method="POST">
+      <button type="submit">Remove</button>
+    </form>
+  </li>`).join('')}</ul>`;
+
+
     const todoPageWithNotes = todoPage.replace('*', notesList);
 
     if (url === '/') {
@@ -35,6 +43,15 @@ function router(request, response) {
 
         return;
 
+    } else if (url.startsWith('/todo/delete_note')) {
+        const noteIndex = parseInt(url.split('/').pop());
+        if (noteIndex >= 0 && noteIndex < notesArray.length) {
+            notesArray.splice(noteIndex, 1);
+
+            response.writeHead(200, { Location: '/todo.html' });
+            return response.end(todoPageWithNotes);
+        }
+
     } else {
         response.statusCode = 404;
         // const { errorPage } = require('./pages'); // One can either write it like this or define the page at the top, with the other two pages. 
@@ -45,12 +62,12 @@ function router(request, response) {
 
 
 function addTodo(data) {
-
     // const notesTerminal = processUserData(data);
-
-    const { title, text } = parseFormData(data);
-    const notesTerminal = `${title}\n${text}\n`;
+    const { title, text } = parseFormData(data); // Extracts the title and text from the Formular. 
+    const notesTerminal = `${title}\n${text}\n`; // \x1b[1mTitel\x1b[0m // This makes it, so that titel is bold in the Terminal.
     notesArray.push(notesTerminal);
+
+
 
     fs.exists(filename, exists => {
 
@@ -66,8 +83,8 @@ function addTodo(data) {
 
 
 function parseFormData(data) {
-    const formData = new URLSearchParams(data);
-    return {
+    const formData = new URLSearchParams(data); // data gets transformed into an Object and separates the input (title and text).
+    return { // This returns
         title: formData.get('title'),
         text: formData.get('text')
     };
@@ -85,7 +102,7 @@ function updateNotes(filename, notesTerminal) {
     fs.readFile(filename, "utf-8", (error, content) => {
 
         if (!error) {
-            createFile(filename, [content, notesTerminal].join("\n"));
+            createFile(filename, [content, notesTerminal].join("\n")); // content and notesTerminal get combined and then are saved in filename.
 
         } else {
             console.error(`Could not read file ${filename}.`);
@@ -105,7 +122,10 @@ function createFile(filename, notesTerminal) {
 }
 
 
-function deleteNote() {
 
+function deleteNote(index) {
+    notesArray.splice(index, 1);
 }
+
+
 module.exports = { router };
