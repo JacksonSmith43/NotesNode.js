@@ -1,8 +1,13 @@
 const fs = require('fs');
 const { welcomePage, errorPage, todoPage } = require("./pages.js");
-const notesArray = []; 
+
+const notesArray = []; // Browser.
+const filename = "./todo.txt";
+
 function router(request, response) {
     const { url, method } = request;
+    const notesList = `<ul>${notesArray.map(notesTerminal => `<li>${notesTerminal}</li>`).join('')}</ul>`;
+    const todoPageWithNotes = todoPage.replace('*', notesList);
 
     if (url === '/') {
         response.writeHead(301, { Location: '/index.html' });
@@ -16,19 +21,16 @@ function router(request, response) {
         return response.end(welcomePage);
 
     } else if (url === '/todo.html') {
-        const notesList = `<ul>${notesArray.map(note => `<li>${note}</li>`).join('')}</ul>`;
-        const todoPageWithNotes = todoPage.replace('*', notesList);
-        return response.end(todoPageWithNotes);        
+        return response.end(todoPageWithNotes);
 
     } else if (url === '/todo/adding_note' && method === 'POST') {
         let data = '';
         request.on('data', (chunk) => (data += chunk.toString()));
         request.on('end', () => {
-            const { title, text } = parseFormData(data);
-            const note = `${title}: ${text}`;
-            notesArray.push(note); 
-            response.writeHead(302, { Location: '/todo.html' });
-            return response.end();
+            addTodo(data);
+
+            response.writeHead(200, { Location: '/todo.html' });
+            return response.end(todoPageWithNotes);
         });
 
         return;
@@ -44,19 +46,19 @@ function router(request, response) {
 
 function addTodo(data) {
 
-    const filename = "./todo.txt";
-    // const note = processUserData(data);
-    
+    // const notesTerminal = processUserData(data);
+
     const { title, text } = parseFormData(data);
-    const note = `${title}\n${text}\n`;
-    
+    const notesTerminal = `${title}\n${text}\n`;
+    notesArray.push(notesTerminal);
+
     fs.exists(filename, exists => {
 
         if (exists) {
-            updateNotes(filename, note);
+            updateNotes(filename, notesTerminal);
 
         } else {
-            createFile(filename, note);
+            createFile(filename, notesTerminal);
         }
 
     });
@@ -79,11 +81,11 @@ function parseFormData(data) {
 }*/
 
 
-function updateNotes(filename, note) {
+function updateNotes(filename, notesTerminal) {
     fs.readFile(filename, "utf-8", (error, content) => {
 
         if (!error) {
-            createFile(filename, [content, note].join("\n"));
+            createFile(filename, [content, notesTerminal].join("\n"));
 
         } else {
             console.error(`Could not read file ${filename}.`);
@@ -91,26 +93,19 @@ function updateNotes(filename, note) {
     });
 }
 
-function createFile(filename, note) {
-    console.log(`Creating file ${filename}:`, "\n", note);
+function createFile(filename, notesTerminal) {
+    console.log(`Creating file ${filename}:`, "\n", notesTerminal);
 
-    fs.writeFile(filename, note, error => {
+    fs.writeFile(filename, notesTerminal, error => {
         if (error) {
             console.error(`Could not create file ${filename}.`);
             console.log(error);
         }
     });
 }
-function parseFormData(data) {
-    const formData = new URLSearchParams(data);
-    return {
-        title: formData.get('title'),
-        text: formData.get('text')
-    };
-}
 
-function deleteNote(){
-    
-}
 
+function deleteNote() {
+
+}
 module.exports = { router };
