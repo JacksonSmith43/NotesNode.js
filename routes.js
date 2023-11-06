@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { welcomePage, errorPage, todoPage } = require("./pages.js");
-
+const notesArray = []; 
 function router(request, response) {
     const { url, method } = request;
 
@@ -16,16 +16,19 @@ function router(request, response) {
         return response.end(welcomePage);
 
     } else if (url === '/todo.html') {
-        return response.end(todoPage);
-        
+        const notesList = `<ul>${notesArray.map(note => `<li>${note}</li>`).join('')}</ul>`;
+        const todoPageWithNotes = todoPage.replace('*', notesList);
+        return response.end(todoPageWithNotes);        
 
     } else if (url === '/todo/adding_note' && method === 'POST') {
         let data = '';
         request.on('data', (chunk) => (data += chunk.toString()));
         request.on('end', () => {
-            addTodo(data);
-            response.writeHead(200, { Location: '/todo.html' });
-            return response.end(todoPage);
+            const { title, text } = parseFormData(data);
+            const note = `${title}: ${text}`;
+            notesArray.push(note); 
+            response.writeHead(302, { Location: '/todo.html' });
+            return response.end();
         });
 
         return;
@@ -98,7 +101,13 @@ function createFile(filename, note) {
         }
     });
 }
-
+function parseFormData(data) {
+    const formData = new URLSearchParams(data);
+    return {
+        title: formData.get('title'),
+        text: formData.get('text')
+    };
+}
 
 function deleteNote(){
     
